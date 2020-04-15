@@ -9,7 +9,7 @@ _start:
     movq $60, %rax
     syscall         # return RDI
 
-.type sum, function
+.type sum, @function
 sum:
     push %rbp        # System V x64 calling convention
     movq %rsp, %rbp  #
