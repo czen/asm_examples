@@ -15,7 +15,7 @@ _start:
 fib:
     push %rbp        # System V x64 calling convention
     movq %rsp, %rbp  #
-    # subq $0, %rsp    # this frame will have 0 local variable, all in registers
+    subq $8, %rsp    # this frame will have 1 local variable
     movq %rdi, %rcx  # read n parameter from RDI
                      # RCX = n
                      # R9 = fib(n-2)
