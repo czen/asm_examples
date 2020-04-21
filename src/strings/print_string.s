@@ -35,9 +35,13 @@ len_loop:
         jmp len_loop # Continue loop
 end_len:
         movq $1,%rdi # File descriptor of STDOUT
-        movq 16(%ebp),%rsi # Print parameter 1
+        movq 16(%rbp),%rsi # Print parameter 1
         # EDX (=Length of string) has been calculated above!
         movq $1,%rax # Write to stream
+        nop
+print_arg:     
+        nop
+        nop
         syscall
         # Print postfix
         movq $1,%rdi # File descriptor of STDOUT
