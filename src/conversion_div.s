@@ -16,37 +16,42 @@
 	# table      - helper table for conversion to hexadecimal
 	#
 
-.section .data
+.data
 number:		.quad 0xf12345A7
 hex_number:	.asciz "________" # eight underscores to make sure there is enough space for four bytes
 table:		.ascii "0123456789ABCDEF"
 format:     .asciz "%s\n"
 
-.section .text
-.global main
+.text
+.global main # эту программу будем компилировать gcc, чтобы сразу подключился printf
 
 main:
-    movq $8, %rdx            # initializing loop counter
+    movq $8, %rcx            # initializing loop counter
     movq $0, %rdi            # initializing sum of the ASCII codes
+    movq $16, %r10
     movq number(,%rdi,8), %rax    # storing number in register
 
 start_loop:	                  # start loop
-	cmpq $0, %rdx             # check to see if we've hit the end
+	cmpq $0, %rcx             # check to see if we've hit the end
 	je loop_exit              # go to exit
 
-	decq %rdx                 # decrement the loop counter
+	decq %rcx                 # decrement the loop counter
 
     mov %rax, %rbx            # saving number in another register
     and $15, %rbx             # getting last digit
 
-    shr %rax                  # shift left to get next digit
-    shr %rax
-    shr %rax
-    shr %rax
+    movq $0, %rdx    # don't forget to clear upper part of divident
+    divq %r10        # divide %rax by 16
+                     # remainder in %rdx = next digit
+                     # quatient in %rax = remaining number
+    # shr %rax                  # shift left to get next digit
+    # shr %rax
+    # shr %rax
+    # shr %rax
 
-    movb table(,%rbx, 1), %cl   # getting ASCII code for digit
-    movb %cl, hex_number(,%rdx, 1)  # setting character in string
-    add %rcx, %rdi                  # summing ASCII codes
+    movb table(,%rbx, 1), %dl   # getting ASCII code for digit
+    movb %dl, hex_number(,%rcx, 1)  # setting character in string
+    add %rdx, %rdi                  # summing ASCII codes
     jmp start_loop                  # go to loop start
 
 loop_exit:
