@@ -2,6 +2,9 @@ ports:
 - port: 8080
   onOpen: open-preview
 
+image:
+  file: Dockerfile
+
 vscode:
   extensions:
     - 13xforever.language-x86-64-assembly@2.3.0:dKy0jkZoaiVtfGdObetbCw==
