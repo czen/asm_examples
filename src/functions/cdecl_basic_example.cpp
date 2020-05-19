@@ -1,5 +1,10 @@
 #include <cstdio>
-  extern "C"  int foo(int,int);
+
+#define CDECL __attribute__((cdecl))
+#define STDCALL __attribute__((stdcall))
+
+
+  extern int CDECL  foo(int,int);
 
 asm(
 ".global foo\n"
