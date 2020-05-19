@@ -1,5 +1,5 @@
 #include <cstdio>
-  extern  "C"  int foo(int,int);
+  extern "C"  int foo(int,int);
 
 asm(
 ".global foo\n"
