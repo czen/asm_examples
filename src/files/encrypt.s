@@ -16,7 +16,7 @@
 # the file
 .section .data
 chars:		.ascii "    "
-.equ SPACE, ' '
+.equ SPACE, '\n'
 
 error: .string "Program parameter(s) incorrect\n" # Auto-terminated
 .set error_len,.-error
@@ -48,10 +48,12 @@ encrypt_loop:
         cmpq $END_OF_FILE, %rax
         # je loop_end
         jl print_other_error
+        cmpq $0, %rax
+        je loop_end
         movq $0, %rcx
         cmpb $SPACE, BUFFER_DATA(,%rcx,1)
         je loop_end
-        movq $BUFFER_DATA, %rdi
+        movq BUFFER_DATA(,%rcx,1), %rdi
         xor %r8, %rdi
         
         movq %rdi, chars(,%rcx,1)
@@ -61,6 +63,7 @@ encrypt_loop:
         movq $4,%rdx # Length of string
         movq $1,%rax # Write to stream
         syscall
+        jmp encrypt_loop
 
 loop_end:
         jmp program_end
