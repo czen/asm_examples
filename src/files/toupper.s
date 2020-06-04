@@ -32,11 +32,12 @@
 .equ ST_ARGV_0, 8 # Name of program (address = pointer to string)
 .equ ST_ARGV_1, 16 # Input file name (address = pointer to string)
 .equ ST_ARGV_2, 24 # Output file name (address = pointer to string)
+.globl _start
 _start:
-###INITIALIZE PROGRAM###
+# ##INITIALIZE PROGRAM###
 movq %rsp, %rbp # Create new stack frame
 subq $ST_SIZE_RESERVE, %rsp # Allocate file descriptor space on stack
-###CHECK PARAMETER COUNT###
+# ##CHECK PARAMETER COUNT###
 cmpq $3, ST_ARGC(%rbp)
 je open_files
 movq $-1, %rdi # Our return value for parameter problems
@@ -44,7 +45,7 @@ movq $SYS_EXIT, %rax
 syscall
 open_files:
 open_fd_in:
-###OPEN INPUT FILE###
+# ##OPEN INPUT FILE###
 movq ST_ARGV_1(%rbp), %rdi # Input filename into %rdi
 movq $O_RDONLY, %rsi # Read-only flag
 movq $O_PERMS, %rdx # This doesn't really matter for reading
@@ -54,18 +55,6 @@ cmpq $0, %rax # Check success
 jl exit # In case of error simply terminate
 store_fd_in:
 movq %rax, ST_FD_IN(%rbp) # Save the returned file descriptor
-open_fd_out:
-###OPEN OUTPUT FILE###
-movq ST_ARGV_2(%rbp), %rdi # Output filename into %rdi
-movq $O_CREAT_WRONLY_TRUNC, %rsi # Flags for writing to the file
-movq $O_PERMS, %rdx # Permissions for new file (if created)
-movq $SYS_OPEN, %rax # Open the file
-syscall # Call Linux
-cmpq $0, %rax # Check success
-jl close_input # In case of error close input file
-# (already open!)
-store_fd_out:
-movq %rax, ST_FD_OUT(%rbp) # Store the file descriptor
 open_fd_out:
 ###OPEN OUTPUT FILE###
 movq ST_ARGV_2(%rbp), %rdi # Output filename into %rdi
@@ -123,25 +112,24 @@ movq ST_FD_IN(%rbp), %rdi
 movq $SYS_CLOSE, %rax
 syscall
 exit:
-###EXIT###
+# ##EXIT###
 movq $0, %rdi
 movq $SYS_EXIT, %rax
 syscall
-
-#####FUNCTION convert_to_upper
-#PURPOSE: This function actually does the conversion to upper case for a block
-#INPUT: The first parameter (rdi) is the location of the block of memory to convert
+# ####FUNCTION convert_to_upper
+# PURPOSE: This function actually does the conversion to upper case for a block
+# INPUT: The first parameter (rdi) is the location of the block of memory to convert
 # The second parameter (rsi) is the length of that buffer
-#OUTPUT: This function overwrites the current buffer with the upper-casified version.
-#VARIABLES:
+# OUTPUT: This function overwrites the current buffer with the upper-casified version.
+# VARIABLES:
 # %rax - beginning of buffer
 # %rbx - length of buffer (old value must be saved!)
 # %rdi - current buffer offset
 # %r10b - current byte being examined (%r10b is the first byte of %r10)
 # Note: This variable assignment is for exemplary purposes only and very suboptimal!
-.equ LOWERCASE_A, 'a’ # The lower boundary of our search
-.equ LOWERCASE_Z, 'z’ # The upper boundary of our search
-.equ UPPER_CONVERSION, 'A' - ‘a’
+.equ LOWERCASE_A, 'a' # The lower boundary of our search
+.equ LOWERCASE_Z, 'z' # The upper boundary of our search
+.equ UPPER_CONVERSION, 'A' - 'a'
 # Conversion: Difference upper/lower case
 convert_to_upper:
 pushq %rbp # Prepare stack
