@@ -54,6 +54,25 @@ struct Graph* createGraph(struct Edge edges[], int n)
 	return graph;
 }
 
+void freeGraph(struct Graph* graph) {
+    unsigned i;
+
+	// initialize head pointer for all vertices
+	for (i = 0; i < N; i++) {
+        struct Node* p = graph->head[i];
+        struct Node* p1 = NULL;
+        while(p->next != NULL) {
+            p1 = p->next;
+            free(p);
+            p = p1;
+        }
+
+        //free(graph->head[i]); // that would be freeing it twice
+        graph->head[i] = NULL;
+    }
+
+}
+
 // Function to print adjacency list representation of graph
 void printGraph(struct Graph* graph)
 {
@@ -91,6 +110,8 @@ int main(void)
 
 	// print adjacency list representation of graph
 	printGraph(graph);
+
+    freeGraph(graph);
 
 	return 0;
 }
